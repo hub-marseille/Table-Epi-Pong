@@ -31,9 +31,9 @@ void      loop() {
       for(int x = 0; x < (newPosition - oldPosition); x++)
       {
         digitalWrite(stepPin,HIGH); 
-        delayMicroseconds(500); 
+        delayMicroseconds(400); 
         digitalWrite(stepPin,LOW); 
-        delayMicroseconds(500); 
+        delayMicroseconds(400); 
       }
       oldPosition = newPosition;
     }
@@ -43,9 +43,9 @@ void      loop() {
       for(int x = 0; x < (oldPosition - newPosition); x++)
       {
         digitalWrite(stepPin,HIGH);
-        delayMicroseconds(500);
+        delayMicroseconds(400);
         digitalWrite(stepPin,LOW);
-        delayMicroseconds(500);
+        delayMicroseconds(400);
         digitalWrite(dirPin,LOW);
       }
     oldPosition = newPosition;
