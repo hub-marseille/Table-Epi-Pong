@@ -5,6 +5,9 @@ LIB: OctoWS2811
 39 per players
 60 in the middle
 
+NOTE: the leds are tied in groups of 3
+13 per players
+20 in the middle
                    PLAYER MASTER
 +***-***-***-***-***-***-***-***-***-***-***-***-***+
 *                                                   *
