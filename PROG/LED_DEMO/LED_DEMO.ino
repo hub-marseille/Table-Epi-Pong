@@ -1,50 +1,78 @@
-#include <OctoWS2811.h>
+#define WS2811_PIN  35
+#define NUMLED  66 
 
-const int ledsPerStrip = 66; //39+39+60+60;
+unsigned char pixels[NUMLED*3];
 
-DMAMEM int displayMemory[ledsPerStrip*6];
-int drawingMemory[ledsPerStrip*6];
-
-const int config = WS2811_GRB | WS2811_800kHz;
-
-OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
-
-void setup() {
-  leds.begin();
-  leds.show();
-  Serial.begin(9600);
-  Serial.println( leds.numPixels());
-}
-
-#define RED    0xFF0000
-#define GREEN  0x0000FF
-#define BLUE   0x00FF00
-#define YELLOW 0xFF00FF
-#define PINK   0xFF8810
-#define ORANGE 0xE00058
-#define WHITE  0xFFFFFF
-
-void loop() {
-int microsec = 500000 / ledsPerStrip;  // change them all in 2 seconds
-//int microsec = 1;
-
-
-  colorWipe(BLUE, microsec);
-  colorWipe(GREEN, microsec);
-  colorWipe(BLUE, microsec);
-  colorWipe(YELLOW, microsec);
-  colorWipe(PINK, microsec);
-  colorWipe(ORANGE, microsec);
-  colorWipe(WHITE, microsec);
-}
-
-void colorWipe(int color, int wait)
+void setup(void)
 {
-  for (int i=0; i < ledsPerStrip; i++) {
-    leds.setPixel(i, color);
-    leds.show();
-    Serial.println("lightling up a led groups !");
-    delayMicroseconds(wait);
-  }
-  Serial.println("\rNEXT COLOR");
+        pinMode(WS2811_PIN, OUTPUT);
+        digitalWrite(WS2811_PIN, LOW);
+
+        pixels[0] = 0xFF;  // LED #1 - red
+        pixels[1] = 0xFF;  // LED #1 - blue
+        pixels[2] = 0xFF;  // LED #1 - green
+        pixels[3] = 0xCF;  // LED #2 - red
+        pixels[4] = 0x00;  // LED #2 - blue
+        pixels[5] = 0x8F;  // LED #2 - green
 }
+
+void loop()
+{
+        ws2811();
+        delay(10);
+}
+
+
+
+#if F_CPU == 180000000
+        #define DELAY_T0H       6
+        #define DELAY_T0L       42
+        #define DELAY_T1H       24
+        #define DELAY_T1L       26
+#elif F_CPU == 96000000
+        #define DELAY_T0H       3
+        #define DELAY_T0L       23
+        #define DELAY_T1H       12
+        #define DELAY_T1L       13
+#elif F_CPU == 48000000
+        #define DELAY_T0H       1
+        #define DELAY_T0L       13
+        #define DELAY_T1H       7
+        #define DELAY_T1L       7
+#elif F_CPU == 24000000
+        #error "24 MHz not supported, use 48 or 96 MHz"
+#endif
+
+static inline void delayShort(uint32_t) __attribute__((always_inline, unused));
+static inline void delayShort(uint32_t num)
+{
+        asm volatile(
+                "L_%=_delayMicroseconds:"               "\n\t"
+                "subs   %0, #1"                         "\n\t"
+                "bne    L_%=_delayMicroseconds"         "\n"
+                : "+r" (num) :
+        );
+}
+
+void ws2811() {
+        noInterrupts();
+        for (unsigned char *p = pixels; p < pixels + sizeof(pixels); p++) {
+                unsigned char n = *p;
+                for (int mask = 0x80; mask; mask >>= 1) {
+                        if (n & mask) {
+                                digitalWriteFast(WS2811_PIN, HIGH);
+                                delayShort(DELAY_T1H);
+                                digitalWriteFast(WS2811_PIN, LOW);
+                                delayShort(DELAY_T1L);
+                        } else {
+                                digitalWriteFast(WS2811_PIN, HIGH);
+                                delayShort(DELAY_T0H);
+                                digitalWriteFast(WS2811_PIN, LOW);
+                                delayShort(DELAY_T0L);
+                        }
+                }
+        }
+        interrupts();
+        delayMicroseconds(50);
+}
+

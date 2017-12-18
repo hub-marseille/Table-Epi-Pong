@@ -18,7 +18,7 @@
 
 #include <StepControl.h>
 
-Stepper motor(2, 3);         // STEP pin: 2, DIR pin: 3
+Stepper motor(3, 4);         // STEP pin: 2, DIR pin: 3
 StepControl<> controller;    // Use default settings 
 
 void setup(){
