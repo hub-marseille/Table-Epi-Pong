@@ -18,19 +18,31 @@
 
 #include <StepControl.h>
 
-Stepper motor(29, 30);         // STEP pin: 2, DIR pin: 3 -> mot 4
+Stepper motor(3, 4);         // STEP pin: 2, DIR pin: 3 -> mot 4
 StepControl<> controller;    // Use default settings 
-
+const int enableMot = 8;
+const int endStpMot1 = 2;
 void setup(){
-      pinMode(28, OUTPUT);
-      digitalWrite(28, LOW);
-      motor.setAcceleration(2500);    // stp/s^2
-      motor.setMaxSpeed(5000);         // stp/s
+      pinMode(enableMot, OUTPUT);
+      digitalWrite(enableMot, LOW);
+
+      
+      motor.setAcceleration(2000);    // stp/s^2
+      motor.setMaxSpeed(6000);         // stp/s
       motor.setPullInSpeed(200); //works fine @ 200
 }
 
+
+
+
+int initMot()
+{
+
+  
+}
+
 int target = 100;
-void loop() 
+void loop()
 {
   motor.setTargetRel(target);  // Set target position to 1000 steps from current position
   controller.move(motor);    // Do the move
