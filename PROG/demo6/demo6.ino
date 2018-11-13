@@ -7,8 +7,8 @@
 
 const int enableMot = 8;
 
-Motors paddleMaster(3, 4, 2, 500, 700, 11000);
-Motors paddleSlave(24, 25, 31, 500, 700, 11000);
+Motors paddleMaster(3, 4, 2, 500, 700, 11000); //, {"test1"});
+Motors paddleSlave(24, 25, 31, 500, 700, 11000); //, {"test2"});
 
 //int posPaddle;
 //long posEncoder;

@@ -7,7 +7,6 @@
 
 Motors::Motors(int step, int dir, int endStp, int minSfyZone, int maxSfyZone, int railLength)
 {
-  Serial.println("objet stepper créer");
   _step = step;
   _dir = dir;
   _endStp = endStp;
@@ -27,7 +26,25 @@ void Motors::updateMotor()
 {
   if (!_targets.empty())
   {
-    if (_stepper.currentPosition() != _targets.front().pos)
+    if (_targets.front().homing == true)
+    {
+      _stepper.setAcceleration(MAXACCELERATIONSPEED);
+      _stepper.setSpeed(10000);
+      _stepper.setMaxSpeed(INITSPEED);
+      _stepper.moveTo(-30000);
+      Serial.print("Homing");
+      Serial.println(-30000);
+      while(_endStpState == HIGH)
+      {
+        _endStpState = digitalRead(_endStp);
+        _stepper.run();
+      }
+      _stepper.stop();
+      _stepper.setCurrentPosition(-_minSfyZone);
+      _stepper.setMaxSpeed(MAXSPEED);
+      _targets.erase(_targets.begin());
+    }
+    else if (_stepper.currentPosition() != _targets.front().pos)
     {
       _stepper.moveTo(_targets.front().pos);
       _stepper.run();
@@ -43,33 +60,15 @@ void Motors::updateMotor()
 void Motors::initMotor()
 {
   Serial.println("objet stepper init");
+  this->GoTo(0, 0, false, true); //Homing
 
-
-
-
-  _stepper.setAcceleration(MAXACCELERATIONSPEED);
-  _stepper.setSpeed(10000);
-  _stepper.setMaxSpeed(INITSPEED);
-  _stepper.moveTo(-30000);
-  Serial.print("target1: ");
-  Serial.println(-30000);
-  while(_endStpState == HIGH)
-  {
-    _endStpState = digitalRead(_endStp);
-    _stepper.run();
-  }
-  _stepper.stop();
-  _stepper.setCurrentPosition(-_minSfyZone);
-  _stepper.setMaxSpeed(MAXSPEED);
-
-  delay(1000);
   this->GoTo(_railLength-_minSfyZone);
   this->GoTo(0);
   this->GoTo(_playablePos);
   this->GoTo(_playablePos/2);
 }
 
-void Motors::GoTo(int newTarget, bool isInterupt, bool isHoming)
+void Motors::GoTo(int newTarget, int delay, bool isInterupt, bool isHoming)
 {
   if (isInterupt == true)
       _targets.clear();
