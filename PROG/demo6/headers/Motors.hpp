@@ -9,11 +9,25 @@
 class Motors
 {
 public:
-  Motors(int step, int dir, int endStp, int minSfyZone, int maxSfyZone, int railLength);
+  typedef struct   s_paddleParams
+  {
+    int            minSfyZone;
+    int            maxSfyZone;
+    int            railLength;
+  } t_paddleParams;
+
+  typedef struct   s_motorsInfos
+  {
+    String         name; //Name of the motor/axis
+    t_paddleParams params;
+
+  } t_motorsInfos;
+
+  Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos);
   ~Motors();
   void initMotor();
   void updateMotor();
-  void GoTo(int newTarget, int delay = 0, bool isInterupt = false, bool isHoming = false);
+  void GoTo(int newTarget, int delay = 0, bool isInterupt = false, bool isHoming = false, bool force = false);
 private:
   int _step;
   int _dir;
@@ -23,7 +37,7 @@ private:
   int _maxSfyZone;
   int _railLength;
   int _playablePos;
-  bool _isInit = false;
+  t_motorsInfos _infos;
 
   typedef struct  s_targets
   {

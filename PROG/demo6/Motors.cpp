@@ -5,15 +5,13 @@
 
 #include "headers/Motors.hpp"
 
-Motors::Motors(int step, int dir, int endStp, int minSfyZone, int maxSfyZone, int railLength)
+Motors::Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos)
 {
   _step = step;
   _dir = dir;
   _endStp = endStp;
-  _minSfyZone = minSfyZone;
-  _maxSfyZone = maxSfyZone;
-  _railLength = railLength;
-  _playablePos = railLength-minSfyZone-maxSfyZone;
+  _playablePos = infos.params.railLength-infos.params.minSfyZone-infos.params.maxSfyZone;
+  _infos = infos;
   _stepper = AccelStepper(AccelStepper::DRIVER, _step, _dir);
 }
 
@@ -40,7 +38,7 @@ void Motors::updateMotor()
         _stepper.run();
       }
       _stepper.stop();
-      _stepper.setCurrentPosition(-_minSfyZone);
+      _stepper.setCurrentPosition(-_infos.params.minSfyZone);
       _stepper.setMaxSpeed(MAXSPEED);
       _targets.erase(_targets.begin());
     }
@@ -62,15 +60,28 @@ void Motors::initMotor()
   Serial.println("objet stepper init");
   this->GoTo(0, 0, false, true); //Homing
 
-  this->GoTo(_railLength-_minSfyZone);
+  this->GoTo(_infos.params.railLength-_infos.params.minSfyZone, 0, false, false, true);
   this->GoTo(0);
   this->GoTo(_playablePos);
   this->GoTo(_playablePos/2);
 }
 
-void Motors::GoTo(int newTarget, int delay, bool isInterupt, bool isHoming)
+void Motors::GoTo(int newTarget, int delay, bool isInterupt, bool isHoming, bool force)
 {
-  if (isInterupt == true)
-      _targets.clear();
-  _targets.push_back({newTarget, isHoming, delay});
+  if ((newTarget >= 0 && newTarget <= _playablePos) || force == true)
+  {
+    if (isInterupt == true)
+        _targets.clear();
+    _targets.push_back({newTarget, isHoming, delay});
+  }
+  else
+  {
+    Serial.print("GoTo : ");
+    Serial.print(newTarget);
+    Serial.print(" on motor ");
+    Serial.print(_infos.name);
+    Serial.println(" is forbiden");
+
+  }
+
 }

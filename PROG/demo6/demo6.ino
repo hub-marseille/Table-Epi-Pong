@@ -2,13 +2,17 @@
 //#include <Encoder.h>
 #include "headers/Motors.hpp"
 #include <vector>
+#include "headers/config.hpp"
 
 //Encoder knobLeft(0, 1);
 
 const int enableMot = 8;
+Motors::t_paddleParams paddleParams = {500, 700, 11000};
+Motors::t_paddleParams ballShortParams = {0, 0, 0};
+Motors::t_paddleParams ballLongParams = {0, 0, 0};
 
-Motors paddleMaster(3, 4, 2, 500, 700, 11000); //, {"test1"});
-Motors paddleSlave(24, 25, 31, 500, 700, 11000); //, {"test2"});
+Motors paddleMaster(3, 4, 2, {"paddle master", paddleParams});
+Motors paddleSlave(24, 25, 31, {"paddle slave", paddleParams});
 
 //int posPaddle;
 //long posEncoder;
