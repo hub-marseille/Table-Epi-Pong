@@ -5,13 +5,14 @@
 
 #include "headers/Motors.hpp"
 
-Motors::Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos)
+Motors::Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos, Motors::t_paddleParams params)
 {
   _step = step;
   _dir = dir;
   _endStp = endStp;
-  _playablePos = infos.params.railLength-infos.params.minSfyZone-infos.params.maxSfyZone;
   _infos = infos;
+  _params = params;
+  _playablePos = params.railLength-params.minSfyZone-params.maxSfyZone;
   _stepper = AccelStepper(AccelStepper::DRIVER, _step, _dir);
 }
 
@@ -30,7 +31,9 @@ void Motors::updateMotor()
       _stepper.setSpeed(10000);
       _stepper.setMaxSpeed(INITSPEED);
       _stepper.moveTo(-30000);
-      Serial.print("Homing");
+      Serial.print("Homing ");
+      Serial.print(_infos.name);
+      Serial.print(" ");
       Serial.println(-30000);
       while(_endStpState == HIGH)
       {
@@ -38,7 +41,7 @@ void Motors::updateMotor()
         _stepper.run();
       }
       _stepper.stop();
-      _stepper.setCurrentPosition(-_infos.params.minSfyZone);
+      _stepper.setCurrentPosition(-_params.minSfyZone);
       _stepper.setMaxSpeed(MAXSPEED);
       _targets.erase(_targets.begin());
     }
@@ -60,7 +63,7 @@ void Motors::initMotor()
   Serial.println("objet stepper init");
   this->GoTo(0, 0, false, true); //Homing
 
-  this->GoTo(_infos.params.railLength-_infos.params.minSfyZone, 0, false, false, true);
+  this->GoTo(_params.railLength-_params.minSfyZone, 0, false, false, true);
   this->GoTo(0);
   this->GoTo(_playablePos);
   this->GoTo(_playablePos/2);

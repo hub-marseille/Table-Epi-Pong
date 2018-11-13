@@ -19,11 +19,9 @@ public:
   typedef struct   s_motorsInfos
   {
     String         name; //Name of the motor/axis
-    t_paddleParams params;
-
   } t_motorsInfos;
 
-  Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos);
+  Motors(int step, int dir, int endStp, Motors::t_motorsInfos infos, Motors::t_paddleParams params);
   ~Motors();
   void initMotor();
   void updateMotor();
@@ -38,6 +36,7 @@ private:
   int _railLength;
   int _playablePos;
   t_motorsInfos _infos;
+  t_paddleParams _params;
 
   typedef struct  s_targets
   {

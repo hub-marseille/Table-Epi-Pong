@@ -11,8 +11,8 @@ Motors::t_paddleParams paddleParams = {500, 700, 11000};
 Motors::t_paddleParams ballShortParams = {0, 0, 0};
 Motors::t_paddleParams ballLongParams = {0, 0, 0};
 
-Motors paddleMaster(3, 4, 2, {"paddle master", paddleParams});
-Motors paddleSlave(24, 25, 31, {"paddle slave", paddleParams});
+Motors paddleMaster(3, 4, 2, {"paddle master"}, paddleParams );
+Motors paddleSlave(24, 25, 31, {"paddle slave"}, paddleParams);
 
 //int posPaddle;
 //long posEncoder;
