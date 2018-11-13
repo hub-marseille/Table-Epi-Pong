@@ -1,65 +1,48 @@
 #include <AccelStepper.h>
-#include <Encoder.h>
+//#include <Encoder.h>
+#include "headers/Motors.hpp"
+#include <vector>
 
-AccelStepper stepper(AccelStepper::DRIVER, 3, 4);
-Encoder knobLeft(0, 1);
+//Encoder knobLeft(0, 1);
 
 const int enableMot = 8;
-const int endStp = 2;
 
-const int initSpeed = 150;
-const int maxSpeed = 6000;
-const int maxAccelerationSpeed = 2000;
+Motors paddleMaster(3, 4, 2, 500, 700, 11000);
+Motors paddleSlave(24, 25, 31, 500, 700, 11000);
 
-int posPaddle;
-int posPaddleMinGame = 100;
-int posPaddleMaxGame = 100;
-int posPaddleMax = 2700;
-
-long posEncoder;
-
-int endStpState = HIGH;
-
-enum way {ASC, DESC, SAME};
-int encoderWay = SAME;
+//int posPaddle;
+//long posEncoder;
+//enum way {ASC, DESC, SAME};
+//int encoderWay = SAME;
+bool   doOnce = true;
 
 void setup()
 {
-      Serial.begin(115200);
-      //while (!Serial) {;}
-      pinMode(enableMot, OUTPUT);
-      digitalWrite(enableMot, LOW);
+  Serial.begin(115200);
+  while (!Serial) {;}
+  Serial.println("Demo 6");
 
-      pinMode(endStp, INPUT); // enstop to init motor
-
-      stepper.setAcceleration(maxAccelerationSpeed);
-      stepper.setSpeed(1000);
-      //stepper.direction(DIRECTION_CW);
+  pinMode(enableMot, OUTPUT);
+  digitalWrite(enableMot, LOW);
+  pinMode(2, INPUT); // endstop to init motor
+  pinMode(31, INPUT); // endstop to init motor
 
 
-      initMot();
+  //paddleMaster.initMotor();
+  paddleMaster.initMotor();
+  paddleSlave.initMotor();
 
-      delay(1000);
-      stepper.setMaxSpeed(maxSpeed);
-
-      //knobLeft.write(posPaddleMax/2);
-      //stepper.moveTo(posPaddleMax/2);
-      delay(5000);
+  delay(1000);
 }
 
-void initMot()
+void loop()
 {
-    stepper.setMaxSpeed(initSpeed);
-    stepper.moveTo(3000);
-    while(endStpState == HIGH)
-    {
-      endStpState = digitalRead(endStp);
-      stepper.run();
-    }
-    stepper.stop();
-    stepper.setCurrentPosition(posPaddleMax);
+  paddleMaster.updateMotor();
+  paddleSlave.updateMotor();
+
 }
 
+/*
 int updateEncoderWay(long newEncoder)
 {
   int newEncoderWay;
@@ -73,10 +56,30 @@ int updateEncoderWay(long newEncoder)
 
   return (newEncoderWay);
 }
+*/
+
+//int pos = 1000;
 
 
-void loop()
-{
+  /*Serial.println("loop");
+  stepper.setMaxSpeed(maxSpeed);
+  stepper.moveTo(pos);
+  if (stepper.currentPosition() >= pos)
+    pos = 0;
+  else if (stepper.currentPosition() < pos)
+    pos = -1000;
+*/
+
+/*
+stepper.moveTo(pos);
+
+  stepper.run();
+}
+
+*/
+
+
+/*
   long newEncoder;
   int newEncoderWay;
 
@@ -132,3 +135,4 @@ void loop()
     stepper.run();
 
 }
+*/
