@@ -1,6 +1,9 @@
+/*
+ Guigur(.com) 2018
+ guigur13@gmail.com
+*/
+
 #include "headers/Motors.hpp"
-
-
 
 Motors::Motors(int step, int dir, int endStp, int minSfyZone, int maxSfyZone, int railLength)
 {
@@ -11,7 +14,7 @@ Motors::Motors(int step, int dir, int endStp, int minSfyZone, int maxSfyZone, in
   _minSfyZone = minSfyZone;
   _maxSfyZone = maxSfyZone;
   _railLength = railLength;
-  _playablePos= railLength-minSfyZone-maxSfyZone;
+  _playablePos = railLength-minSfyZone-maxSfyZone;
   _stepper = AccelStepper(AccelStepper::DRIVER, _step, _dir);
 }
 
@@ -24,14 +27,14 @@ void Motors::updateMotor()
 {
   if (!_targets.empty())
   {
-    if (_stepper.currentPosition() != _targets.front())
+    if (_stepper.currentPosition() != _targets.front().pos)
     {
-      _stepper.moveTo(_targets.front());
+      _stepper.moveTo(_targets.front().pos);
       _stepper.run();
     }
     else
     {
-      Serial.println(_targets.front());
+      Serial.println(_targets.front().pos);
       _targets.erase(_targets.begin());
     }
   }
@@ -41,14 +44,15 @@ void Motors::initMotor()
 {
   Serial.println("objet stepper init");
 
+
+
+
   _stepper.setAcceleration(MAXACCELERATIONSPEED);
   _stepper.setSpeed(10000);
-
   _stepper.setMaxSpeed(INITSPEED);
   _stepper.moveTo(-30000);
-  _target = -30000;
   Serial.print("target1: ");
-  Serial.println(_target);
+  Serial.println(-30000);
   while(_endStpState == HIGH)
   {
     _endStpState = digitalRead(_endStp);
@@ -57,17 +61,17 @@ void Motors::initMotor()
   _stepper.stop();
   _stepper.setCurrentPosition(-_minSfyZone);
   _stepper.setMaxSpeed(MAXSPEED);
+
   delay(1000);
-  _targets.push_back(_railLength-_minSfyZone);
-  _targets.push_back(0);
-  _targets.push_back(_playablePos);
-  _targets.push_back(_playablePos/2);
+  this->GoTo(_railLength-_minSfyZone);
+  this->GoTo(0);
+  this->GoTo(_playablePos);
+  this->GoTo(_playablePos/2);
 }
 
-void Motors::GoTo(int newTarget, bool isInterupt)
+void Motors::GoTo(int newTarget, bool isInterupt, bool isHoming)
 {
   if (isInterupt == true)
       _targets.clear();
-  _targets.push_back(newTarget);
-Serial.println("GOTO");
+  _targets.push_back({newTarget, isHoming, delay});
 }

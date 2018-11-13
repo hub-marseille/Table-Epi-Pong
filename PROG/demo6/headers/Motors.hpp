@@ -13,7 +13,7 @@ public:
   ~Motors();
   void initMotor();
   void updateMotor();
-  void GoTo(int newTarget, bool isInterupt);
+  void GoTo(int newTarget, bool isInterupt = false, bool isHoming = false);
 private:
   int _step;
   int _dir;
@@ -24,8 +24,15 @@ private:
   int _railLength;
   int _playablePos;
   bool _isInit = false;
-  int _target = 0;
-  std::vector<int> _targets;
+
+  typedef struct  s_targets
+  {
+    int           pos; //Absolute pos
+    bool          isHoming; //Set this to true to home the motor, the pos will be ignored
+    int           delay; //Delay after cmd
+  } t_tagets;
+
+  std::vector<t_tagets> _targets;
   int _endStpState = HIGH;
 };
 
