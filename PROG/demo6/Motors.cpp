@@ -30,11 +30,9 @@ void Motors::updateMotor()
       _stepper.setAcceleration(MAXACCELERATIONSPEED);
       _stepper.setSpeed(10000);
       _stepper.setMaxSpeed(INITSPEED);
-      _stepper.moveTo(-30000);
-      Serial.print("Homing ");
-      Serial.print(_infos.name);
-      Serial.print(" ");
-      Serial.println(-30000);
+      _stepper.moveTo(_targets.front().pos);
+
+      Serial.print("Homing ");Serial.println(_infos.name);
       while(_endStpState == HIGH)
       {
         _endStpState = digitalRead(_endStp);
@@ -52,7 +50,7 @@ void Motors::updateMotor()
     }
     else
     {
-      Serial.println(_targets.front().pos);
+    Serial.print("GOTO DONE: ");Serial.println(_targets.front().pos);
       _targets.erase(_targets.begin());
     }
   }
@@ -61,7 +59,7 @@ void Motors::updateMotor()
 void Motors::initMotor()
 {
   Serial.println("objet stepper init");
-  this->GoTo(0, 0, false, true); //Homing
+  this->GoTo(-30000, 0, false, true); //Homing
 
   this->GoTo(_params.railLength-_params.minSfyZone, 0, false, false, true);
   this->GoTo(0);
@@ -71,7 +69,7 @@ void Motors::initMotor()
 
 void Motors::GoTo(int newTarget, int delay, bool isInterupt, bool isHoming, bool force)
 {
-  if ((newTarget >= 0 && newTarget <= _playablePos) || force == true)
+  if ((newTarget >= 0 && newTarget <= _playablePos) || force == true || (isHoming == true && newTarget < 0))
   {
     if (isInterupt == true)
         _targets.clear();
@@ -79,12 +77,6 @@ void Motors::GoTo(int newTarget, int delay, bool isInterupt, bool isHoming, bool
   }
   else
   {
-    Serial.print("GoTo : ");
-    Serial.print(newTarget);
-    Serial.print(" on motor ");
-    Serial.print(_infos.name);
-    Serial.println(" is forbiden");
-
+    Serial.print("GoTo : ");Serial.print(newTarget);Serial.print(" on motor ");Serial.print(_infos.name);Serial.println(" is forbiden");
   }
-
 }
